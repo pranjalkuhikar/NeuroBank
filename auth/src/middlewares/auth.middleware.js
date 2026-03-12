@@ -15,7 +15,9 @@ export const authMiddleware = async (req, res, next) => {
     }
   } catch (error) {
     console.error("Redis Error in authMiddleware:", error);
-    return res.status(500).json({ message: "Internal server error during authentication check" });
+    return res
+      .status(500)
+      .json({ message: "Internal server error during authentication check" });
   }
 
   try {
@@ -23,6 +25,6 @@ export const authMiddleware = async (req, res, next) => {
     req.user = decoded;
     next();
   } catch (error) {
-    return res.status(401).json({ message: "Invalid token" });
+    return res.status(401).json({ message: "Invalid token", error });
   }
 };

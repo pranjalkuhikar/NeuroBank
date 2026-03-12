@@ -1,33 +1,42 @@
-import expressValidator from "express-validator";
+import { body, validationResult } from "express-validator";
+
+export const handleValidationErrors = (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({
+      message: "Validation failed",
+      errors: errors.array().map((e) => ({ field: e.param, msg: e.msg })),
+    });
+  }
+  next();
+};
 
 export const registerValidator = [
-  expressValidator
-    .body("fullName.firstName")
+  body("fullName.firstName")
+    .trim()
     .notEmpty()
     .withMessage("First Name is Required"),
-  expressValidator
-    .body("fullName.lastName")
+  body("fullName.lastName")
+    .trim()
     .notEmpty()
     .withMessage("Last Name is Required"),
-  expressValidator.body("email").isEmail().withMessage("Email is Required"),
-  expressValidator
-    .body("password")
-    .isLength({ min: 6 })
-    .withMessage("Password must be at least 6 characters long"),
-  expressValidator
-    .body("role")
-    .isIn(["user", "admin"])
-    .withMessage("Role must be either user or admin"),
-  expressValidator
-    .body("isEmailVerify")
-    .isBoolean()
-    .withMessage("isEmailVerify must be a boolean"),
+  body("email")
+    .isEmail()
+    .normalizeEmail()
+    .withMessage("Valid email is required"),
+  body("password")
+    .isLength({ min: 8 })
+    .withMessage("Password must be at least 8 characters long"),
+  handleValidationErrors,
 ];
 
 export const loginValidator = [
-  expressValidator.body("email").isEmail().withMessage("Email is Required"),
-  expressValidator
-    .body("password")
+  body("email")
+    .isEmail()
+    .normalizeEmail()
+    .withMessage("Valid email is required"),
+  body("password")
     .isLength({ min: 6 })
     .withMessage("Password must be at least 6 characters long"),
+  handleValidationErrors,
 ];

@@ -5,35 +5,26 @@ import jwt from "jsonwebtoken";
 
 export const register = async (req, res) => {
   try {
-    const {
-      fullName: { firstName, lastName },
-      email,
-      password,
-      role,
-      isVerifyEmail,
-    } = req.body;
-    if (
-      !firstName ||
-      !lastName ||
-      !email ||
-      !password ||
-      !role ||
-      !isVerifyEmail
-    ) {
+    const { fullName = {}, email, password } = req.body;
+    const firstName = fullName?.firstName?.trim();
+    const lastName = fullName?.lastName?.trim();
+    const normalizedEmail = email?.toLowerCase().trim();
+
+    if (!firstName || !lastName || !normalizedEmail || !password) {
       return res.status(400).json({ message: "All Data is Required" });
     }
 
-    const isAlreadyExists = await User.findOne({ email });
+    const isAlreadyExists = await User.findOne({ email: normalizedEmail });
     if (isAlreadyExists) {
-      return res.status(400).json({ message: "Email is Already Exits" });
+      return res.status(409).json({ message: "Email already exists" });
     }
 
     const user = await User.create({
       fullName: { firstName, lastName },
-      email,
+      email: normalizedEmail,
       password,
-      role,
-      isVerifyEmail,
+      role: "user",
+      isVerifyEmail: false,
     });
 
     return res.status(201).json({ message: "User is Created", user });
@@ -47,32 +38,40 @@ export const register = async (req, res) => {
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
-    if (!email || !password) {
+    const normalizedEmail = email?.toLowerCase().trim();
+    if (!normalizedEmail || !password) {
       return res.status(400).json({ message: "All Data is Required" });
     }
 
-    const user = await User.findOne({ email }).select("+password");
+    const user = await User.findOne({ email: normalizedEmail }).select(
+      "+password",
+    );
     if (!user) {
-      return res.status(400).json({ message: "Email is not Exits" });
+      return res.status(401).json({ message: "Invalid credentials" });
     }
 
     const isMatch = await user.matchPassword(password);
     if (!isMatch) {
-      return res.status(400).json({ message: "Invalid credentials" });
+      return res.status(401).json({ message: "Invalid credentials" });
     }
 
     const token = jwt.sign({ id: user._id }, config.JWT_SECRET, {
       expiresIn: config.JWT_EXPIRE,
     });
 
-    res.cookie(token, {
+    res.cookie("token", token, {
       httpOnly: true,
-      expires: new Date(Date.now() + config.JWT_EXPIRE),
       secure: config.NODE_ENV === "production",
       sameSite: "strict",
+      path: "/",
+      maxAge: Number(config.JWT_EXPIRE) * 1000,
     });
 
-    return res.status(201).json({ message: "Login Successful", user, token });
+    const { password: _pw, ...userSafe } = user.toObject();
+
+    return res
+      .status(200)
+      .json({ message: "Login Successful", user: userSafe, token });
   } catch (error) {
     return res.status(500).json({
       message: error.message,
@@ -84,10 +83,12 @@ export const logout = async (req, res) => {
   try {
     const token = req.cookies.token;
     if (!token) {
-      return res.status(400).json({ message: "No token provided" });
+      return res.status(401).json({ message: "No token provided" });
     }
 
-    await redis.set(`blacklist:${token}`, "true", { ex: 3600 });
+    await redis.set(`blacklist:${token}`, "true", {
+      ex: Math.max(Number(config.JWT_EXPIRE) || 3600, 1),
+    });
     res.clearCookie("token");
 
     return res.status(200).json({ message: "User is Logout" });

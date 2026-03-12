@@ -1,5 +1,6 @@
 import User from "../models/auth.model.js";
 import config from "../configs/config.js";
+import redis from "../utils/redis.js";
 import jwt from "jsonwebtoken";
 
 export const register = async (req, res) => {
@@ -77,8 +78,13 @@ export const login = async (req, res) => {
   }
 };
 
-export const logout = (req, res) => {
+export const logout = async (req, res) => {
   try {
+    const token = req.cookies.token;
+    if (!token) {
+      return res.status(400).json({ message: "No token provided" });
+    }
+    await redis.set(`blacklist:${token}`, "true", { ex: 3600 });
     res.clearCookie("token");
     return res.status(200).json({ message: "User is Logout" });
   } catch (error) {
@@ -88,8 +94,10 @@ export const logout = (req, res) => {
   }
 };
 
-export const profile = (req, res) => {
+export const profile = async (req, res) => {
   try {
+    const user = await User.findById(req.user.id);
+    return res.status(200).json({ message: "User Profile", user });
   } catch (error) {
     return res.status(500).json({
       message: error.message,

@@ -68,6 +68,8 @@ export const login = async (req, res) => {
     res.cookie(token, {
       httpOnly: true,
       expires: new Date(Date.now() + config.JWT_EXPIRE),
+      secure: config.NODE_ENV === "production",
+      sameSite: "strict",
     });
 
     return res.status(201).json({ message: "Login Successful", user, token });

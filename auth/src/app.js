@@ -17,4 +17,11 @@ app.get("/", (req, res) => {
   res.send("Hello World!");
 });
 
+app.use((req, res, next) => {
+  res.status(404).json({
+    success: false,
+    message: "API endpoint not found",
+  });
+});
+
 export default app;

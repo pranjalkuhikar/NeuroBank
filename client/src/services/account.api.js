@@ -33,8 +33,5 @@ export const accountApi = createApi({
   }),
 });
 
-export const {
-  useCreateAccountMutation,
-  useGetAccountQuery,
-  useProfileQuery,
-} = accountApi;
+export const { useCreateAccountMutation, useGetAccountQuery, useProfileQuery } =
+  accountApi;

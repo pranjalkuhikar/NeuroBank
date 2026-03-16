@@ -10,14 +10,14 @@ export const accountApi = createApi({
   endpoints: (build) => ({
     createAccount: build.mutation({
       query: (body) => ({
-        url: "/create",
+        url: "/createAccount",
         method: "POST",
         body,
       }),
     }),
     getAccount: build.query({
       query: () => ({
-        url: "/get",
+        url: "/getAccount",
         method: "GET",
       }),
     }),

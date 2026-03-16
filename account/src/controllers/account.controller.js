@@ -27,7 +27,7 @@ export const createAccount = async (req, res) => {
   }
 };
 
-export const getBalance = async (req, res) => {
+export const getAccount = async (req, res) => {
   try {
     const account = await Account.findOne({
       owner: req.user.id,

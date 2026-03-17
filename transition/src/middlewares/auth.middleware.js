@@ -49,11 +49,10 @@ export const systemUserMiddleware = async (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, config.JWT_SECRET);
-    const user = await userModel.findById(decoded.id).select("+systemUser");
-    if (!user.systemUser) {
+    if (!decoded.systemUser) {
       return res.status(403).json({ message: "User is not a system user" });
     }
-    req.user = user;
+    req.user = decoded;
     next();
   } catch (error) {
     return res.status(401).json({ message: "Invalid token", error });

@@ -174,6 +174,8 @@ export const getTransitions = async (req, res) => {
   }
 };
 
+import crypto from "crypto";
+
 export const generateInitialFunds = async (req, res) => {
   try {
     const { toAccount, amount, idempotencyKey } = req.body;
@@ -186,70 +188,82 @@ export const generateInitialFunds = async (req, res) => {
     const toUserAccount = await Account.findById(toAccount);
     if (!toUserAccount) {
       return res.status(400).json({
-        message: "Account does not exist",
+        message: "Target account does not exist",
       });
     }
 
-    const fromUserAccount = await Account.findOne({ userId: req.user._id });
+    const fromUserAccount = await Account.findOne({ owner: req.user.id });
     if (!fromUserAccount) {
       return res.status(400).json({
-        message: "Account does not exist",
+        message: "System account does not exist",
       });
     }
 
     const session = await mongoose.startSession();
     session.startTransaction();
 
-    const transition = await Transition.create({
-      fromAccount: fromUserAccount._id,
-      toAccount: toUserAccount._id,
-      amount: amount,
-      idempotencyKey: crypto.randomUUID(),
-      status: "pending",
-    });
+    try {
+      const [transition] = await Transition.create(
+        [
+          {
+            fromAccount: fromUserAccount._id,
+            toAccount: toUserAccount._id,
+            amount: amount,
+            idempotencyKey: idempotencyKey,
+            status: "pending",
+          },
+        ],
+        { session },
+      );
 
-    const debitLedgerEntry = await Ledger.create(
-      [
-        {
-          accountId: fromUserAccount._id,
-          amount: amount,
-          transitionId: transition._id,
-          type: "debit",
-        },
-      ],
-      { session },
-    );
+      const debitLedgerEntry = await Ledger.create(
+        [
+          {
+            accountId: fromUserAccount._id,
+            amount: amount,
+            transitionId: transition._id,
+            type: "debit",
+          },
+        ],
+        { session },
+      );
 
-    const creditLedgerEntry = await Ledger.create(
-      [
-        {
-          accountId: toUserAccount._id,
-          amount: amount,
-          transitionId: transition._id,
-          type: "credit",
-        },
-      ],
-      { session },
-    );
+      const creditLedgerEntry = await Ledger.create(
+        [
+          {
+            accountId: toUserAccount._id,
+            amount: amount,
+            transitionId: transition._id,
+            type: "credit",
+          },
+        ],
+        { session },
+      );
 
-    await Transition.findOneAndUpdate(
-      { _id: transition._id },
-      { status: "completed" },
-      { session },
-    );
+      await Transition.findOneAndUpdate(
+        { _id: transition._id },
+        { status: "completed" },
+        { session },
+      );
 
-    await session.commitTransaction();
-    session.endSession();
+      await session.commitTransaction();
+      session.endSession();
 
-    return res.status(201).json({
-      message: "Transition created successfully",
-      transition,
-      debitLedgerEntry: debitLedgerEntry[0],
-      creditLedgerEntry: creditLedgerEntry[0],
-    });
+      return res.status(201).json({
+        message: "Initial funds generated successfully",
+        transition,
+        debitLedgerEntry: debitLedgerEntry[0],
+        creditLedgerEntry: creditLedgerEntry[0],
+      });
+    } catch (err) {
+      await session.abortTransaction();
+      session.endSession();
+      throw err;
+    }
   } catch (error) {
+    console.error("Fund Generation Error:", error);
     return res.status(500).json({
-      message: "Internal server error",
+      message: "Internal server error during fund generation",
     });
   }
 };

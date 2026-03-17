@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import {
   CreditCard,
   Plus,
@@ -21,6 +22,7 @@ import {
 } from "../services/account.api";
 
 const Accounts = ({ onMenuClick }) => {
+  const navigate = useNavigate();
   const { data: profile } = useProfileQuery();
   const { data, isLoading, error } = useGetAccountQuery();
   const [createAccount, { isLoading: isCreating }] = useCreateAccountMutation();
@@ -253,7 +255,10 @@ const Accounts = ({ onMenuClick }) => {
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <button className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-8 py-4 rounded-2xl bg-[#1a1d2d] text-white font-bold text-sm hover:bg-[#232738] transition-all border border-white/5">
+                  <button
+                    onClick={() => navigate("/transfer")}
+                    className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-8 py-4 rounded-2xl bg-[#1a1d2d] text-white font-bold text-sm hover:bg-[#232738] transition-all border border-white/5"
+                  >
                     Send Money
                   </button>
                 </div>

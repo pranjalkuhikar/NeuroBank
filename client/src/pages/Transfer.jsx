@@ -19,6 +19,8 @@ import {
   useCreateTransitionMutation,
   useGetHistoryQuery,
 } from "../services/transition.api";
+import { useDispatch } from "react-redux";
+import { accountApi } from "../services/account.api";
 
 const Transfer = ({ onMenuClick }) => {
   const [step, setStep] = useState(1);
@@ -31,6 +33,7 @@ const Transfer = ({ onMenuClick }) => {
     note: "",
   });
 
+  const dispatch = useDispatch();
   const { data: accountData, isLoading: isAccountLoading } =
     useGetAccountQuery();
   const accountId = accountData?.account?._id;
@@ -51,6 +54,11 @@ const Transfer = ({ onMenuClick }) => {
   };
 
   const handleConfirmTransfer = async () => {
+    if (accountData?.account?.balance < Number(formData.amount)) {
+      setErrorMsg("Insufficient balance for this transfer.");
+      return;
+    }
+
     setErrorMsg("");
     if (!accountId) {
       setErrorMsg("Your account details are not loaded. Please refresh.");
@@ -66,6 +74,8 @@ const Transfer = ({ onMenuClick }) => {
       }).unwrap();
 
       if (result) {
+        // Invalidate account cache to refetch balance in real-time
+        dispatch(accountApi.util.invalidateTags(["Account"]));
         setStep(3);
       }
     } catch (err) {

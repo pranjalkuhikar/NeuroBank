@@ -35,6 +35,12 @@ function preventLedgerModification() {
   throw new Error("Ledger cannot be modified");
 }
 
+ledgerSchema.pre("save", function () {
+  if (!this.isNew) {
+    throw new Error("Ledger cannot be modified");
+  }
+});
+
 ledgerSchema.pre("findOneAndUpdate", preventLedgerModification);
 ledgerSchema.pre("findOneAndReplace", preventLedgerModification);
 ledgerSchema.pre("findOneAndDelete", preventLedgerModification);
@@ -45,7 +51,6 @@ ledgerSchema.pre("updateOne", preventLedgerModification);
 ledgerSchema.pre("updateMany", preventLedgerModification);
 ledgerSchema.pre("deleteOne", preventLedgerModification);
 ledgerSchema.pre("deleteMany", preventLedgerModification);
-ledgerSchema.pre("save", preventLedgerModification);
 ledgerSchema.pre("remove", preventLedgerModification);
 ledgerSchema.pre("delete", preventLedgerModification);
 

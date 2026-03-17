@@ -2,6 +2,7 @@ import Transition from "../models/transition.model.js";
 import Account from "../models/account.model.js";
 import Ledger from "../models/ledger.model.js";
 import mongoose from "mongoose";
+import { publishToQueue } from "../broker/rabbit.js";
 
 export const createTransition = async (req, res) => {
   try {
@@ -129,11 +130,16 @@ export const createTransition = async (req, res) => {
     await session.commitTransaction();
     session.endSession();
 
+    await publishToQueue("transition.completed", {
+      fromAccount: fromAccount,
+      toAccount: toAccount,
+      amount: amount,
+      transitionId: transition._id,
+    });
+
     return res.status(201).json({
       message: "Transition created successfully",
       transition,
-      debitLedgerEntry: debitLedgerEntry[0],
-      creditLedgerEntry: creditLedgerEntry[0],
     });
   } catch (error) {
     if (error.name === "CastError") {
@@ -256,11 +262,16 @@ export const generateInitialFunds = async (req, res) => {
       await session.commitTransaction();
       session.endSession();
 
+      await publishToQueue("transition.completed", {
+        fromAccount: fromUserAccount._id,
+        toAccount: toUserAccount._id,
+        amount: amount,
+        transitionId: transition._id,
+      });
+
       return res.status(201).json({
         message: "Initial funds generated successfully",
         transition,
-        debitLedgerEntry: debitLedgerEntry[0],
-        creditLedgerEntry: creditLedgerEntry[0],
       });
     } catch (err) {
       await session.abortTransaction();

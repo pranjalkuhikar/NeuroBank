@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const ledgerSchema = new mongoose.Schema({
   accountId: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: String,
     ref: "Account",
     required: true,
     index: true,

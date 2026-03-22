@@ -1,3 +1,5 @@
+import { publishToQueue } from "./rabbit.js";
+
 const resolveContact = (account, fallback = {}) => ({
   email: account?.ownerEmail || fallback.email,
   firstName: account?.ownerName?.firstName || fallback.firstName,

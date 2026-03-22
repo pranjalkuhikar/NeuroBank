@@ -29,7 +29,7 @@ export const register = async (req, res) => {
       systemUser: false,
     });
 
-    publishToQueue("user_created", {
+    await publishToQueue("user_created", {
       email: user.email,
       firstName: user.fullName.firstName,
       lastName: user.fullName.lastName,
@@ -76,8 +76,6 @@ export const login = async (req, res) => {
     });
 
     const { password: _pw, ...userSafe } = user.toObject();
-
-    publishToQueue("user.login", userSafe);
 
     return res
       .status(200)

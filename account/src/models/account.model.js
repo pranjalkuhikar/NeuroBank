@@ -9,8 +9,16 @@ const accountSchema = new mongoose.Schema(
     },
 
     ownerName: {
-      type: String,
-      required: true,
+      firstName: {
+        type: String,
+        required: true,
+        trim: true,
+      },
+      lastName: {
+        type: String,
+        required: true,
+        trim: true,
+      },
     },
 
     accountNumber: {

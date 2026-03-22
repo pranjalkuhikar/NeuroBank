@@ -67,18 +67,27 @@ const attachConsumer = async ({ queueName, callback }) => {
     return;
   }
 
-  await channel.assertQueue(queueName, { durable: true });
-  await channel.consume(queueName, async (msg) => {
+  const activeChannel = channel;
+
+  await activeChannel.assertQueue(queueName, { durable: true });
+  await activeChannel.consume(queueName, async (msg) => {
     if (msg === null) {
       return;
     }
 
     try {
       await callback(JSON.parse(msg.content.toString()));
-      channel?.ack(msg);
+      activeChannel.ack(msg);
     } catch (error) {
       console.error(`Error processing message from ${queueName}:`, error);
-      channel?.nack(msg, false, true);
+      try {
+        activeChannel.nack(msg, false, true);
+      } catch (ackError) {
+        console.error(
+          `Failed to nack message from ${queueName}:`,
+          ackError.message,
+        );
+      }
     }
   });
 };
@@ -160,9 +169,11 @@ export const publishToQueue = async (queueName, data) => {
     return false;
   }
 
+  const activeChannel = channel;
+
   try {
-    await channel.assertQueue(queueName, { durable: true });
-    channel.sendToQueue(queueName, Buffer.from(JSON.stringify(data)), {
+    await activeChannel.assertQueue(queueName, { durable: true });
+    activeChannel.sendToQueue(queueName, Buffer.from(JSON.stringify(data)), {
       persistent: true,
     });
 

@@ -1,14 +1,13 @@
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { View } from "react-native";
 import "react-native-reanimated";
 import "../global.css";
 
 export default function RootLayout() {
   return (
-    <View>
-      <Stack></Stack>
+    <>
+      <Stack />
       <StatusBar style="auto" />
-    </View>
+    </>
   );
 }

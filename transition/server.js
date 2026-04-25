@@ -4,6 +4,9 @@ import connectDB from "./src/db/db.js";
 import { connectMQ } from "./src/broker/rabbit.js";
 import { startAccountConsumer } from "./src/broker/accountConsumer.js";
 
+import dns from "node:dns";
+dns.setServers(["8.8.8.8", "1.1.1.1"]);
+
 const port = config.PORT;
 
 const bootstrap = async () => {

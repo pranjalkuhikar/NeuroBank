@@ -19,7 +19,10 @@ const Profile = () => {
         Profile Settings
       </Text>
       <View>
-        <Image></Image>
+        <Image
+          source={{ uri: "https://i.pravatar.cc/150?img=11" }}
+          style={{ width: 100, height: 100, borderRadius: 50 }}
+        />
         <Text>
           Test Test <CheckCircle className="w-5 h-5 text-blue-500" />
         </Text>
@@ -27,18 +30,21 @@ const Profile = () => {
         <View className="flex-row justify-center">
           <View className="flex-1">
             <Text className="text-base font-semibold dark:text-primary">
-              Personal Information
+              Member Since
             </Text>
+            <Text>Apr 2026</Text>
           </View>
           <View className="flex-1">
             <Text className="text-base font-semibold dark:text-primary">
-              Security & Privacy
+              Account Level
             </Text>
+            <Text>Platinum Pro</Text>
           </View>
           <View className="flex-1">
             <Text className="text-base font-semibold dark:text-primary">
-              Notifications
+              Safety Score
             </Text>
+            <Text>98/100</Text>
           </View>
         </View>
       </View>

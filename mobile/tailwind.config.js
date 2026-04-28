@@ -4,7 +4,14 @@ module.exports = {
   content: ["./app/**/*.{js,jsx,ts,tsx}"],
   presets: [require("nativewind/preset")],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        // Map the CSS variables to Tailwind colors
+        primary: "rgb(var(--color-primary))",
+        background: "rgb(var(--color-background))",
+        text: "rgb(var(--color-text))",
+      },
+    },
   },
   plugins: [],
 };

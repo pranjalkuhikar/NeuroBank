@@ -1,4 +1,10 @@
-import { View, Text, Pressable, useColorScheme } from "react-native";
+import {
+  View,
+  Text,
+  Pressable,
+  ScrollView,
+  useColorScheme,
+} from "react-native";
 import {
   Sparkles,
   ShieldCheck,
@@ -18,8 +24,14 @@ const Account = () => {
   const [createAccount, { isLoading: isCreating }] = useCreateAccountMutation();
   const colorScheme = useColorScheme();
 
-  const handleCreateAccount = () => {};
-
+  const handleCreateAccount = async () => {
+    try {
+      await createAccount({}).unwrap();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  // Step-1
   if ((error && "status" in error && error.status === 404) || !data?.account) {
     return (
       <View className="flex flex-col justify-center mt-20 gap-5 items-center">
@@ -92,12 +104,15 @@ const Account = () => {
     );
   }
 
+  // /Step-2
+  const account = data.account;
   return (
-    <View>
-      <Text>Account</Text>
-      <Text>Profile: {profile?.email}</Text>
-      <Text>Account: {data?.accountNumber}</Text>
-    </View>
+    <ScrollView>
+      <View>
+        <Text>Main Vault</Text>
+        <Text>Manage your primary assets and liquidity</Text>
+      </View>
+    </ScrollView>
   );
 };
 

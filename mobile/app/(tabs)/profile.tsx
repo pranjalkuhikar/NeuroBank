@@ -41,11 +41,11 @@ const Profile = () => {
       </Text>
       {/* Profile */}
       <View className="bg-white flex flex-col items-center gap-4 dark:bg-[#0f1221] rounded-[32px] border border-gray-200 dark:border-white/5 p-8 mb-8 relative overflow-hidden shadow-sm">
-        <Image
-          source={{ uri: "https://i.pravatar.cc/250?img=10" }}
-          style={{ width: 100, height: 100, borderRadius: 50 }}
-          className="border-4 border-blue-500/20 dark:border-white/5 p-1"
-        />
+        <View className="w-20 h-20 rounded-full bg-blue-500 flex items-center justify-center border-4 border-blue-500/20">
+          <Text className="text-white font-black text-5xl">
+            {user?.user?.fullName?.firstName.charAt(0).toUpperCase()}
+          </Text>
+        </View>
         <View className="flex-row items-center justify-center gap-2">
           <Text className="text-2xl font-semibold dark:text-white">
             {user?.user?.fullName?.firstName} {user?.user?.fullName?.lastName}

@@ -4,7 +4,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 export const transitionApi = createApi({
   reducerPath: "transitionApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: "http://localhost:3004/api/transition",
+    baseUrl: `http://${process.env.EXPO_PUBLIC_API_URL}:3004/api/transition`,
     credentials: "include",
   }),
   tagTypes: ["Transition"],

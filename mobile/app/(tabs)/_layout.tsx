@@ -7,7 +7,6 @@ import { View, Text } from "react-native";
 export default function TabLayout() {
   const { colorScheme } = useColorScheme();
 
-  // Use RTK Query to check if the user has a valid session/profile
   const {
     data: user,
     isLoading,
@@ -27,7 +26,6 @@ export default function TabLayout() {
     );
   }
 
-  // If the request fails (e.g. 401 Unauthorized) or there is no user data, redirect!
   if (isError || !user) {
     return <Redirect href="/login" />;
   }

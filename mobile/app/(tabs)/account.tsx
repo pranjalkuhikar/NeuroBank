@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, ScrollView, Pressable } from "react-native";
+import { View, Text, ScrollView, Pressable, RefreshControl } from "react-native";
 import { router } from "expo-router";
 import { useColorScheme } from "nativewind";
 import {
@@ -22,9 +22,19 @@ import {
 
 const account = () => {
   const { colorScheme } = useColorScheme();
-  const { data: profile } = useProfileQuery({});
-  const { data, isLoading, error } = useGetAccountQuery({});
+  const { data: profile, refetch: refetchProfile } = useProfileQuery({});
+  const { data, isLoading, error, refetch: refetchAccount } = useGetAccountQuery(
+    {},
+  );
   const [createAccount, { isLoading: isCreating }] = useCreateAccountMutation();
+
+  const [refreshing, setRefreshing] = React.useState(false);
+
+  const onRefresh = React.useCallback(async () => {
+    setRefreshing(true);
+    await Promise.all([refetchProfile(), refetchAccount()]);
+    setRefreshing(false);
+  }, []);
 
   const handleCreateAccount = async () => {
     try {
@@ -136,6 +146,9 @@ const account = () => {
     <ScrollView
       className="flex-1 bg-gray-50 dark:bg-[#0c0f1a]"
       contentContainerStyle={{ paddingBottom: 40 }}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
     >
       <View className="p-5 md:p-8 lg:p-12 mt-5">
         {/* Header Section */}

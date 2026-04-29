@@ -1,4 +1,5 @@
-import { View, Text, ScrollView, Pressable } from "react-native";
+import React from "react";
+import { View, Text, ScrollView, Pressable, RefreshControl } from "react-native";
 import { useGetHistoryQuery } from "../../services/transition.api.js";
 import { useGetAccountQuery } from "../../services/account.api.js";
 import {
@@ -9,31 +10,49 @@ import {
   ArrowDownLeft,
 } from "lucide-react-native";
 const History = () => {
-  const { data: accountData, isLoading: isAccountLoading } = useGetAccountQuery(
-    {},
-  );
+  const {
+    data: accountData,
+    isLoading: isAccountLoading,
+    refetch: refetchAccount,
+  } = useGetAccountQuery({});
   const accountId = accountData?.account?._id;
 
   const {
     data: historyData,
     isLoading: isHistoryLoading,
-    refetch,
+    refetch: refetchHistory,
   } = useGetHistoryQuery(accountId, {
     skip: !accountId,
   });
+
+  const [refreshing, setRefreshing] = React.useState(false);
+
+  const onRefresh = React.useCallback(async () => {
+    setRefreshing(true);
+    await Promise.all([
+      refetchAccount(),
+      accountId ? refetchHistory() : Promise.resolve(),
+    ]);
+    setRefreshing(false);
+  }, [accountId]);
   const transactions = historyData?.transitions || [];
   if (isAccountLoading || isHistoryLoading) {
     return (
-      <div className="flex-1 flex items-center justify-center bg-gray-50 dark:bg-[#0c0f1a]">
-        <div className="relative">
-          <div className="absolute inset-0 bg-blue-500/20 blur-2xl rounded-full animate-pulse"></div>
-          <Loader2 className="w-10 h-10 text-blue-600 animate-spin relative z-10" />
-        </div>
-      </div>
+      <View className="flex-1 items-center justify-center bg-gray-50 dark:bg-[#0c0f1a]">
+        <View className="relative">
+          <View className="absolute inset-0 bg-blue-500/20 rounded-full"></View>
+          <Loader2 className="w-10 h-10 text-blue-600" />
+        </View>
+      </View>
     );
   }
   return (
-    <ScrollView className="py-10 px-5">
+    <ScrollView
+      className="py-10 px-5"
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
+    >
       <View className="px-10 py-5">
         <Text className="text-4xl text-center font-bold text-gray-900 dark:text-white tracking-tight">
           Transaction Archive

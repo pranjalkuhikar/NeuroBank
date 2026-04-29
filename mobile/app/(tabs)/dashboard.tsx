@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, ScrollView, Pressable } from "react-native";
+import { View, Text, ScrollView, Pressable, RefreshControl } from "react-native";
 import { router } from "expo-router";
 import { useColorScheme } from "nativewind";
 import {
@@ -22,21 +22,35 @@ import { useGetHistoryQuery } from "../../services/transition.api.js";
 
 const Dashboard = () => {
   const { colorScheme } = useColorScheme();
-  const { data: profile } = useProfileQuery({});
+  const { data: profile, refetch: refetchProfile } = useProfileQuery({});
   const {
     data: accountData,
     isLoading: isAccountLoading,
     error: accountError,
+    refetch: refetchAccount,
   } = useGetAccountQuery({});
   const [createAccount, { isLoading: isCreating }] = useCreateAccountMutation();
 
   const accountId = accountData?.account?._id;
-  const { data: historyData, isLoading: isHistoryLoading } = useGetHistoryQuery(
-    accountId,
-    {
-      skip: !accountId,
-    },
-  );
+  const {
+    data: historyData,
+    isLoading: isHistoryLoading,
+    refetch: refetchHistory,
+  } = useGetHistoryQuery(accountId, {
+    skip: !accountId,
+  });
+
+  const [refreshing, setRefreshing] = React.useState(false);
+
+  const onRefresh = React.useCallback(async () => {
+    setRefreshing(true);
+    await Promise.all([
+      refetchProfile(),
+      refetchAccount(),
+      accountId ? refetchHistory() : Promise.resolve(),
+    ]);
+    setRefreshing(false);
+  }, [accountId]);
 
   const handleCreateAccount = async () => {
     try {
@@ -96,6 +110,9 @@ const Dashboard = () => {
     <ScrollView
       className="flex-1 bg-[#f8fafc] dark:bg-[#050714]"
       contentContainerStyle={{ paddingBottom: 40 }}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
     >
       {/* Header */}
       <View className="flex-row items-center justify-between px-6 pt-16 pb-6">

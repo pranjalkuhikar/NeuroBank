@@ -36,7 +36,7 @@ const Profile = () => {
 
   return (
     <ScrollView className="bg-gray-50 dark:bg-[#050714] py-10 px-4">
-      <Text className="text-3xl my-3 font-semibold dark:text-white">
+      <Text className="text-3xl text-center my-3 font-semibold dark:text-white">
         Profile Settings
       </Text>
       {/* Profile */}

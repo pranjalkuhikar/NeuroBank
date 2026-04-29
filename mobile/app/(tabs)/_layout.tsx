@@ -1,9 +1,36 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { Tabs } from "expo-router";
+import { Tabs, Redirect } from "expo-router";
 import { useColorScheme } from "nativewind";
+import { useProfileQuery } from "../../services/auth.api.js";
+import { View, Text } from "react-native";
 
 export default function TabLayout() {
   const { colorScheme } = useColorScheme();
+
+  // Use RTK Query to check if the user has a valid session/profile
+  const {
+    data: user,
+    isLoading,
+    isError,
+  } = useProfileQuery(undefined, {
+    skip: false,
+    refetchOnMountOrArgChange: true,
+    refetchOnReconnect: true,
+    refetchOnFocus: true,
+  });
+
+  if (isLoading) {
+    return (
+      <View className="flex-1 bg-[#f8fafc] dark:bg-[#050714] items-center justify-center">
+        <Text className="dark:text-white font-bold">Loading...</Text>
+      </View>
+    );
+  }
+
+  // If the request fails (e.g. 401 Unauthorized) or there is no user data, redirect!
+  if (isError || !user) {
+    return <Redirect href="/login" />;
+  }
 
   const activeColor = colorScheme === "dark" ? "#ffffffff" : "#3b82f6";
 

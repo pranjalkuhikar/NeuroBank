@@ -1,4 +1,4 @@
-import { ScrollView, View, Text, Image, Pressable, Button } from "react-native";
+import { ScrollView, View, Text, Image, Pressable } from "react-native";
 import {
   User,
   Shield,
@@ -138,7 +138,7 @@ const Profile = () => {
         </View>
       </View>
       {/* Danger Zone */}
-      <View className="bg-white flex mb-1 flex-col items-start gap-4 dark:bg-[#0f1221] rounded-[32px] border border-gray-200 dark:border-white/5 p-8 mb-10 relative overflow-hidden shadow-sm">
+      <View className="bg-white flex flex-col items-start gap-4 dark:bg-[#0f1221] rounded-[32px] border border-gray-200 dark:border-white/5 p-8 mb-10 relative overflow-hidden shadow-sm">
         <View className="flex-row items-center justify-center gap-2">
           <Text className="text-2xl font-semibold text-red-600 uppercase tracking-wider">
             Danger Zone

@@ -1,4 +1,11 @@
-import { ScrollView, View, Text, Image, Pressable } from "react-native";
+import {
+  ScrollView,
+  View,
+  Text,
+  Image,
+  Pressable,
+  ActivityIndicator,
+} from "react-native";
 import {
   User,
   Shield,
@@ -10,10 +17,32 @@ import {
   ChevronRight,
 } from "lucide-react-native";
 import { useColorScheme } from "nativewind";
-import { useProfileQuery } from "../../services/auth.api.js";
+import {
+  useProfileQuery,
+  useLogoutMutation,
+  authApi,
+} from "../../services/auth.api.js";
+import { accountApi } from "../../services/account.api.js";
+import { transitionApi } from "../../services/transition.api.js";
+import { useDispatch } from "react-redux";
+import { router } from "expo-router";
 
 const Profile = () => {
   const { colorScheme, setColorScheme } = useColorScheme();
+  const dispatch = useDispatch();
+  const [logout, { isLoading: isLoggingOut }] = useLogoutMutation();
+
+  const handleLogout = async () => {
+    try {
+      await logout(undefined).unwrap();
+      dispatch(authApi.util.resetApiState());
+      dispatch(accountApi.util.resetApiState());
+      dispatch(transitionApi.util.resetApiState());
+      router.replace("/login");
+    } catch (err) {
+      console.error("Logout failed:", err);
+    }
+  };
   const { data: user } = useProfileQuery(undefined, {
     skip: false,
     refetchOnMountOrArgChange: true,
@@ -137,6 +166,23 @@ const Profile = () => {
           </Pressable>
         </View>
       </View>
+      {/* Logout */}
+      <Pressable
+        onPress={handleLogout}
+        disabled={isLoggingOut}
+        className="flex-row items-center justify-center p-4 rounded-[2rem] bg-white dark:bg-[#0f1221] border border-gray-200 dark:border-white/5 w-full mb-8 shadow-sm"
+      >
+        {isLoggingOut ? (
+          <ActivityIndicator color="#ef4444" />
+        ) : (
+          <View className="flex-row gap-3 items-center justify-center">
+            <View className="w-8 h-8 rounded-lg bg-red-50 dark:bg-red-500/10 items-center justify-center">
+              <LogOut color="#ef4444" size={20} />
+            </View>
+            <Text className="text-red-600 font-bold text-lg">Logout</Text>
+          </View>
+        )}
+      </Pressable>
       {/* Danger Zone */}
       <View className="bg-white flex flex-col items-start gap-4 dark:bg-[#0f1221] rounded-[32px] border border-gray-200 dark:border-white/5 p-8 mb-10 relative overflow-hidden shadow-sm">
         <View className="flex-row items-center justify-center gap-2">

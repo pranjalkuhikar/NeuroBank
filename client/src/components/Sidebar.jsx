@@ -84,12 +84,10 @@ const Sidebar = ({ isOpen, onClose }) => {
 
         <div className="flex items-center justify-between bg-gray-50 dark:bg-[#15182a] p-3 rounded-2xl mb-8 border border-gray-100 dark:border-[#232738] transition-colors">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-indigo-500 overflow-hidden">
-              <img
-                src="https://i.pravatar.cc/150?img=11"
-                alt="Profile"
-                className="w-full h-full object-cover"
-              />
+            <div className="w-10 h-10 rounded-full bg-indigo-500 flex items-center justify-center shadow-inner">
+              <span className="text-white font-black text-lg">
+                {profile?.user?.fullName?.firstName?.charAt(0)?.toUpperCase() || "U"}
+              </span>
             </div>
             <div>
               <p className="text-xs text-gray-500 dark:text-gray-400 uppercase font-medium tracking-wider mb-0.5">

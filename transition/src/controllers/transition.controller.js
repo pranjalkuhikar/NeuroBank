@@ -87,64 +87,39 @@ export const createTransition = async (req, res) => {
     }
 
     // create Transition
-    let transition;
-    const session = await mongoose.startSession();
-    session.startTransaction();
-
     // First create transition
-    transition = (
-      await Transition.create(
-        [
-          {
-            fromAccount,
-            toAccount: searchToId,
-            amount,
-            idempotencyKey,
-            status: "pending",
-          },
-        ],
-        { session },
-      )
-    )[0];
+    const transition = await Transition.create({
+      fromAccount,
+      toAccount: searchToId,
+      amount,
+      idempotencyKey,
+      status: "pending",
+    });
 
     // Second create ledger entry for debit
-    const debitLedgerEntry = await Ledger.create(
-      [
-        {
-          accountId: fromAccount,
-          amount: amount,
-          transitionId: transition._id,
-          type: "debit",
-        },
-      ],
-      { session },
-    );
+    await Ledger.create({
+      accountId: fromAccount,
+      amount: amount,
+      transitionId: transition._id,
+      type: "debit",
+    });
 
     // Simulate clearance
     await new Promise((resolve) => setTimeout(resolve, 15 * 1000));
 
     // Third create ledger entry for credit
-    const creditLedgerEntry = await Ledger.create(
-      [
-        {
-          accountId: searchToId,
-          amount: amount,
-          transitionId: transition._id,
-          type: "credit",
-        },
-      ],
-      { session },
-    );
+    await Ledger.create({
+      accountId: searchToId,
+      amount: amount,
+      transitionId: transition._id,
+      type: "credit",
+    });
 
     // Update status
     await Transition.findOneAndUpdate(
       { _id: transition._id },
       { status: "completed" },
-      { session },
     );
-
-    await session.commitTransaction();
-    session.endSession();
 
     await publishToQueue("transition.completed", {
       fromAccount: fromAccountObj._id,
@@ -257,84 +232,56 @@ export const generateInitialFunds = async (req, res) => {
       });
     }
 
-    const session = await mongoose.startSession();
-    session.startTransaction();
+    const transition = await Transition.create({
+      fromAccount: fromUserAccount._id,
+      toAccount: toUserAccount._id,
+      amount: amount,
+      idempotencyKey: idempotencyKey,
+      status: "pending",
+    });
 
-    try {
-      const [transition] = await Transition.create(
-        [
-          {
-            fromAccount: fromUserAccount._id,
-            toAccount: toUserAccount._id,
-            amount: amount,
-            idempotencyKey: idempotencyKey,
-            status: "pending",
-          },
-        ],
-        { session },
-      );
+    await Ledger.create({
+      accountId: fromUserAccount._id,
+      amount: amount,
+      transitionId: transition._id,
+      type: "debit",
+    });
 
-      const debitLedgerEntry = await Ledger.create(
-        [
-          {
-            accountId: fromUserAccount._id,
-            amount: amount,
-            transitionId: transition._id,
-            type: "debit",
-          },
-        ],
-        { session },
-      );
+    await Ledger.create({
+      accountId: toUserAccount._id,
+      amount: amount,
+      transitionId: transition._id,
+      type: "credit",
+    });
 
-      const creditLedgerEntry = await Ledger.create(
-        [
-          {
-            accountId: toUserAccount._id,
-            amount: amount,
-            transitionId: transition._id,
-            type: "credit",
-          },
-        ],
-        { session },
-      );
+    await Transition.findOneAndUpdate(
+      { _id: transition._id },
+      { status: "completed" },
+    );
 
-      await Transition.findOneAndUpdate(
-        { _id: transition._id },
-        { status: "completed" },
-        { session },
-      );
+    await publishToQueue("transition.completed", {
+      fromAccount: fromUserAccount._id,
+      toAccount: toUserAccount._id,
+      amount,
+      transitionId: transition._id,
+    });
 
-      await session.commitTransaction();
-      session.endSession();
+    await publishNotificationEvents({
+      transition,
+      amount,
+      fromAccountObj: fromUserAccount,
+      toAccountObj: toUserAccount,
+      senderFallback: {
+        email: req.user?.email,
+        firstName: req.user?.fullName?.firstName,
+        lastName: req.user?.fullName?.lastName,
+      },
+    });
 
-      await publishToQueue("transition.completed", {
-        fromAccount: fromUserAccount._id,
-        toAccount: toUserAccount._id,
-        amount,
-        transitionId: transition._id,
-      });
-
-      await publishNotificationEvents({
-        transition,
-        amount,
-        fromAccountObj: fromUserAccount,
-        toAccountObj: toUserAccount,
-        senderFallback: {
-          email: req.user?.email,
-          firstName: req.user?.fullName?.firstName,
-          lastName: req.user?.fullName?.lastName,
-        },
-      });
-
-      return res.status(201).json({
-        message: "Initial funds generated successfully",
-        transition,
-      });
-    } catch (err) {
-      await session.abortTransaction();
-      session.endSession();
-      throw err;
-    }
+    return res.status(201).json({
+      message: "Initial funds generated successfully",
+      transition,
+    });
   } catch (error) {
     console.error("Fund Generation Error:", error);
     return res.status(500).json({

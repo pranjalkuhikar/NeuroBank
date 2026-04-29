@@ -16,7 +16,6 @@ import {
   Wallet,
   Fingerprint,
   Lock,
-  Sun,
 } from "lucide-react-native";
 import { useProfileQuery } from "../../services/auth.api.js";
 import { router } from "expo-router";
@@ -27,7 +26,7 @@ import {
 
 const Account = () => {
   const { data: profile } = useProfileQuery({});
-  const { data, isLoading, error } = useGetAccountQuery({});
+  const { data, error } = useGetAccountQuery({});
   const [createAccount, { isLoading: isCreating }] = useCreateAccountMutation();
   const colorScheme = useColorScheme();
 

@@ -18,8 +18,14 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [login, { isLoading, error }] = useLoginMutation();
+  const errData = (error as any)?.data;
+  const validationErrors = errData?.errors
+    ?.map((e: any) => e.msg || e.message)
+    .filter(Boolean)
+    .join("\n");
   const errorMessage =
-    (error as any)?.data?.message ||
+    validationErrors ||
+    errData?.message ||
     (error as any)?.error ||
     (error && "Login failed. Please try again.");
 

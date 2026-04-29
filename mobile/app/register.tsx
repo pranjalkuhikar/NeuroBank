@@ -20,8 +20,14 @@ const Register = () => {
   const [password, setPassword] = useState("");
 
   const [register, { isLoading, error }] = useRegisterMutation();
+  const errData = (error as any)?.data;
+  const validationErrors = errData?.errors
+    ?.map((e: any) => e.msg || e.message)
+    .filter(Boolean)
+    .join("\n");
   const errorMessage =
-    (error as any)?.data?.message ||
+    validationErrors ||
+    errData?.message ||
     (error as any)?.error ||
     (error && "Registration failed. Please try again.");
 
@@ -31,8 +37,7 @@ const Register = () => {
         await register({
           email,
           password,
-          firstName,
-          lastName,
+          fullName: { firstName, lastName },
         }).unwrap();
         router.replace("/login");
       } catch (err) {

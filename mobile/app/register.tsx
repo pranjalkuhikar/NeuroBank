@@ -9,8 +9,9 @@ import {
   Platform,
 } from "react-native";
 import React, { useState } from "react";
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
 import { User, Mail, Lock, ArrowRight, Sparkles } from "lucide-react-native";
+import { useRegisterMutation } from "../services/auth.api.js";
 
 const Register = () => {
   const [firstName, setFirstName] = useState("");
@@ -18,11 +19,26 @@ const Register = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleRegister = () => {
-    console.log("Registering...");
-    console.log("Name:", firstName, lastName);
-    console.log("Email:", email);
-    console.log("Password:", password);
+  const [register, { isLoading, error }] = useRegisterMutation();
+  const errorMessage =
+    (error as any)?.data?.message ||
+    (error as any)?.error ||
+    (error && "Registration failed. Please try again.");
+
+  const handleRegisteration = async () => {
+    if (email && password) {
+      try {
+        await register({
+          email,
+          password,
+          firstName,
+          lastName,
+        }).unwrap();
+        router.replace("/login");
+      } catch (err) {
+        console.log(err);
+      }
+    }
   };
 
   return (
@@ -131,17 +147,22 @@ const Register = () => {
               </View>
             </View>
 
+            {/* Error Message */}
+            {errorMessage ? (
+              <Text className="text-red-500 mb-4 text-center font-medium">
+                {errorMessage}
+              </Text>
+            ) : null}
+
             {/* Submit Button */}
             <Pressable
               className="bg-blue-600 active:bg-blue-700 h-14 rounded-xl flex-row items-center justify-center shadow-sm shadow-blue-600/30 mb-8"
-              onPress={() => {
-                // handle registration
-              }}
+              onPress={handleRegisteration}
             >
               <Text className="text-white font-semibold text-lg mr-2">
-                Create Account
+                {isLoading ? "Loading..." : "Create Account"}
               </Text>
-              <ArrowRight color="white" size={20} />
+              {!isLoading && <ArrowRight color="white" size={20} />}
             </Pressable>
 
             {/* Login Link */}

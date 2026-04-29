@@ -9,17 +9,32 @@ import {
   Platform,
 } from "react-native";
 import React, { useState } from "react";
-import { Link } from "expo-router";
-import { User, Mail, Lock, ArrowRight, Sparkles } from "lucide-react-native";
+import { Link, router } from "expo-router";
+
+import { Mail, Lock, ArrowRight, Sparkles } from "lucide-react-native";
+import { useLoginMutation } from "../services/auth.api.js";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [login, { isLoading, error }] = useLoginMutation();
+  const errorMessage =
+    (error as any)?.data?.message ||
+    (error as any)?.error ||
+    (error && "Login failed. Please try again.");
 
-  const handleLogin = () => {
-    console.log("Login...");
-    console.log("Email:", email);
-    console.log("Password:", password);
+  const handleLogin = async () => {
+    if (email && password) {
+      try {
+        await login({
+          email,
+          password,
+        }).unwrap();
+        router.replace("/dashboard");
+      } catch (err) {
+        console.log(err);
+      }
+    }
   };
 
   return (
@@ -93,17 +108,22 @@ const Login = () => {
               </View>
             </View>
 
+            {/* Error Message */}
+            {errorMessage ? (
+              <Text className="text-red-500 mb-4 text-center font-medium">
+                {errorMessage}
+              </Text>
+            ) : null}
+
             {/* Submit Button */}
             <Pressable
               className="bg-blue-600 active:bg-blue-700 h-14 rounded-xl flex-row items-center justify-center shadow-sm shadow-blue-600/30 mb-8"
-              onPress={() => {
-                // handle registration
-              }}
+              onPress={handleLogin}
             >
               <Text className="text-white font-semibold text-lg mr-2">
-                Login
+                {isLoading ? "Loading..." : "Login"}
               </Text>
-              <ArrowRight color="white" size={20} />
+              {!isLoading && <ArrowRight color="white" size={20} />}
             </Pressable>
 
             {/* Login Link */}

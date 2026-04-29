@@ -1,4 +1,4 @@
-import { ScrollView, View, Text, Image, Pressable } from "react-native";
+import { ScrollView, View, Text, Image, Pressable, Button } from "react-native";
 import {
   User,
   Shield,
@@ -6,17 +6,18 @@ import {
   Moon,
   Key,
   LogOut,
-  Camera,
   CheckCircle,
   ChevronRight,
 } from "lucide-react-native";
-import { useTheme } from "../context/ThemeContext";
-const { theme, setTheme } = useTheme();
+import { useColorScheme } from "nativewind";
 
 const Profile = () => {
+  const { colorScheme, setColorScheme } = useColorScheme();
   return (
-    <ScrollView className="py-10 px-4">
-      <Text className="text-3xl font-semibold">Profile Settings</Text>
+    <ScrollView className="bg-gray-50 dark:bg-[#050714] py-10 px-4">
+      <Text className="text-3xl font-semibold dark:text-white">
+        Profile Settings
+      </Text>
       {/* Profile */}
       <View className="bg-white flex flex-col items-center gap-4 dark:bg-[#0f1221] rounded-[32px] border border-gray-200 dark:border-white/5 p-8 mb-8 relative overflow-hidden shadow-sm">
         <Image
@@ -25,7 +26,9 @@ const Profile = () => {
           className="border-4 border-blue-500/20 dark:border-white/5 p-1"
         />
         <View className="flex-row items-center justify-center gap-2">
-          <Text className="text-2xl font-semibold">Test Test </Text>
+          <Text className="text-2xl font-semibold dark:text-white">
+            Test Test{" "}
+          </Text>
           <CheckCircle color="#3b82f6" size={20} />
         </View>
         <Text className="text-gray-500 dark:text-gray-400 mb-3 font-semibold">
@@ -36,19 +39,25 @@ const Profile = () => {
             <Text className="text-gray-500 dark:text-gray-400 mb-3 font-semibold">
               Member Since
             </Text>
-            <Text className="text-base font-semibold">Apr 2026</Text>
+            <Text className="text-base font-semibold dark:text-white">
+              Apr 2026
+            </Text>
           </View>
           <View className="flex-1 items-center justify-center">
             <Text className="text-gray-500 dark:text-gray-400 mb-3 font-semibold">
               Account Level
             </Text>
-            <Text className="text-base font-semibold">Platinum Pro</Text>
+            <Text className="text-base font-semibold dark:text-white">
+              Platinum Pro
+            </Text>
           </View>
           <View className="flex-1 items-center justify-center">
             <Text className="text-gray-500 dark:text-gray-400 mb-3 font-semibold">
               Safety Score
             </Text>
-            <Text className="text-base font-semibold">98/100</Text>
+            <Text className="text-base font-semibold dark:text-white">
+              98/100
+            </Text>
           </View>
         </View>
       </View>
@@ -56,12 +65,14 @@ const Profile = () => {
       <View className="bg-white flex flex-col items-start gap-4 dark:bg-[#0f1221] rounded-[32px] border border-gray-200 dark:border-white/5 p-8 mb-8 relative overflow-hidden shadow-sm">
         <View className="flex-row items-center justify-center gap-2">
           <User color="#3b82f6" size={20} />
-          <Text className="text-2xl font-semibold">Personal Information </Text>
+          <Text className="text-2xl font-semibold dark:text-white">
+            Personal Information{" "}
+          </Text>
         </View>
         <Text className="text-gray-500 pl-8 dark:text-gray-400 font-semibold">
           Email Address
         </Text>
-        <View className=" flex-1 flex-row items-center justify-between pl-8  p-3 hover:focus:to-blue-400 rounded-full bg-gray-100 w-full">
+        <View className=" flex-1 flex-row items-center justify-between pl-8  p-3 hover:focus:to-blue-400 rounded-full bg-gray-100 dark:bg-white/5 w-full">
           <Text className="text-gray-900 dark:text-gray-300 font-semibold">
             test@test.com
           </Text>
@@ -72,10 +83,12 @@ const Profile = () => {
       <View className="bg-white flex flex-col items-start gap-4 dark:bg-[#0f1221] rounded-[32px] border border-gray-200 dark:border-white/5 p-8 mb-8 relative overflow-hidden shadow-sm">
         <View className="flex-row items-center justify-center gap-2">
           <Shield color="#3b82f6" size={20} />
-          <Text className="text-2xl font-semibold">Security & Privacy</Text>
+          <Text className="text-2xl font-semibold dark:text-white">
+            Security & Privacy
+          </Text>
         </View>
 
-        <View className=" flex-1 flex-row items-center justify-between pl-8  p-3 hover:focus:to-blue-400 rounded-full bg-gray-100 w-full">
+        <View className=" flex-1 flex-row items-center justify-between pl-8  p-3 hover:focus:to-blue-400 rounded-full bg-gray-100 dark:bg-white/5 w-full">
           <View className="flex-row gap-2 items-center justify-center">
             <View className="w-8 h-8 p-1 flex-row items-center justify-center rounded-lg bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600">
               <Key color="#059669" size={20} />
@@ -91,10 +104,12 @@ const Profile = () => {
       <View className="bg-white flex flex-col items-start gap-4 dark:bg-[#0f1221] rounded-[32px] border border-gray-200 dark:border-white/5 p-8 mb-8 relative overflow-hidden shadow-sm">
         <View className="flex-row items-center justify-center gap-2">
           <Bell color="#F59E0B" size={20} />
-          <Text className="text-2xl font-semibold">App Preference</Text>
+          <Text className="text-2xl font-semibold dark:text-white">
+            App Preference
+          </Text>
         </View>
 
-        <View className=" flex-1 flex-row items-center justify-between pl-8  p-3 hover:focus:to-blue-400 rounded-full bg-gray-100 w-full">
+        <View className=" flex-1 flex-row items-center justify-between pl-8  p-3 hover:focus:to-blue-400 rounded-full bg-gray-100 dark:bg-white/5 w-full">
           <View className="flex-row gap-2 items-center justify-center">
             <View className="w-8 h-8 p-1 flex-row items-center justify-center rounded-lg bg-gray-50 dark:bg-gray-500/10 text-gray-600">
               <Moon color="#718096" size={20} />
@@ -102,19 +117,43 @@ const Profile = () => {
             <Text className="text-gray-900 dark:text-gray-300 font-semibold">
               Dark Mode
             </Text>
-            <Pressable
-              onPress={() => setTheme(theme === "dark" ? "light" : "dark")}
-              className={`w-12 h-6 rounded-full relative p-1 cursor-pointer transition-colors ${theme === "dark" ? "bg-indigo-600" : "bg-gray-200"}`}
-            >
-              <View
-                className={`w-4 h-4 bg-white rounded-full transition-all ${theme === "dark" ? "ml-auto" : ""}`}
-              ></View>
-            </Pressable>
           </View>
-          <ChevronRight className="w-4 h-4 text-gray-400" />
+          <Pressable
+            onPress={() =>
+              setColorScheme(colorScheme === "dark" ? "light" : "dark")
+            }
+            className={`w-12 h-6 rounded-full relative p-1 cursor-pointer transition-colors ${colorScheme === "dark" ? "bg-indigo-600" : "bg-gray-200"}`}
+          >
+            <View
+              className={`w-4 h-4 bg-white rounded-full transition-all ${colorScheme === "dark" ? "ml-auto" : ""}`}
+            ></View>
+          </Pressable>
         </View>
       </View>
       {/* Danger Zone */}
+      <View className="bg-white flex mb-1 flex-col items-start gap-4 dark:bg-[#0f1221] rounded-[32px] border border-gray-200 dark:border-white/5 p-8 mb-10 relative overflow-hidden shadow-sm">
+        <View className="flex-row items-center justify-center gap-2">
+          <Text className="text-2xl font-semibold text-red-600 uppercase tracking-wider">
+            Danger Zone
+          </Text>
+        </View>
+
+        <View className=" hover:focus:to-blue-400 rounded-full w-full">
+          <Text className="text-sm text-red-500/70 mb-6 leading-relaxed">
+            Permanently delete your account and all associated data. This action
+            cannot be undone.
+          </Text>
+          <Pressable
+            onPress={() => {
+              // Delete account logic
+            }}
+            className="w-full flex-row items-center justify-center gap-2 py-3 rounded-xl bg-red-600 hover:bg-red-500 shadow-lg shadow-red-600/20"
+          >
+            <LogOut color="#ffffff" size={20} />
+            <Text className="text-white font-bold">Delete Account</Text>
+          </Pressable>
+        </View>
+      </View>
     </ScrollView>
   );
 };

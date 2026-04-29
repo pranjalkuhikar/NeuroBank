@@ -53,12 +53,10 @@ const ProfilePage = ({ onMenuClick }) => {
           <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 rounded-full blur-3xl -mr-32 -mt-32"></div>
           <div className="relative z-10 flex flex-col md:flex-row items-center gap-8">
             <div className="relative">
-              <div className="w-32 h-32 rounded-full border-4 border-blue-500/20 p-1">
-                <img
-                  src="https://i.pravatar.cc/150?img=11"
-                  alt="Profile"
-                  className="w-full h-full object-cover rounded-full"
-                />
+              <div className="w-32 h-32 rounded-full bg-blue-600 flex items-center justify-center border-4 border-blue-500/20 shadow-inner">
+                <div className="text-white font-black text-6xl">
+                  {user?.user?.fullName?.firstName?.charAt(0)?.toUpperCase() || "U"}
+                </div>
               </div>
               <button className="absolute bottom-0 right-0 w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center border-4 border-white dark:border-[#0f1221] hover:bg-blue-500 transition-all shadow-lg">
                 <Camera className="w-4 h-4" />

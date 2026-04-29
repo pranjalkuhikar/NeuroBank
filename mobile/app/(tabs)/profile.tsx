@@ -10,12 +10,33 @@ import {
   ChevronRight,
 } from "lucide-react-native";
 import { useColorScheme } from "nativewind";
+import { useProfileQuery } from "../../services/auth.api.js";
 
 const Profile = () => {
   const { colorScheme, setColorScheme } = useColorScheme();
+  const { data: user } = useProfileQuery(undefined, {
+    skip: false,
+    refetchOnMountOrArgChange: true,
+    refetchOnReconnect: true,
+    refetchOnFocus: true,
+  });
+  const userStats = [
+    {
+      label: "Member Since",
+      value: user?.user?.createdAt
+        ? new Date(user.user.createdAt).toLocaleDateString("en-US", {
+            month: "short",
+            year: "numeric",
+          })
+        : "...",
+    },
+    { label: "Account Level", value: "Platinum Pro" },
+    { label: "Safety Score", value: "98/100" },
+  ];
+
   return (
     <ScrollView className="bg-gray-50 dark:bg-[#050714] py-10 px-4">
-      <Text className="text-3xl font-semibold dark:text-white">
+      <Text className="text-3xl my-3 font-semibold dark:text-white">
         Profile Settings
       </Text>
       {/* Profile */}
@@ -27,38 +48,24 @@ const Profile = () => {
         />
         <View className="flex-row items-center justify-center gap-2">
           <Text className="text-2xl font-semibold dark:text-white">
-            Test Test{" "}
+            {user?.user?.fullName?.firstName} {user?.user?.fullName?.lastName}
           </Text>
           <CheckCircle color="#3b82f6" size={20} />
         </View>
         <Text className="text-gray-500 dark:text-gray-400 mb-3 font-semibold">
           Verified Platinum Account
         </Text>
-        <View className="flex-row justify-center gap-4">
-          <View className="flex-1 items-center justify-center">
-            <Text className="text-gray-500 dark:text-gray-400 mb-3 font-semibold">
-              Member Since
-            </Text>
-            <Text className="text-base font-semibold dark:text-white">
-              Apr 2026
-            </Text>
-          </View>
-          <View className="flex-1 items-center justify-center">
-            <Text className="text-gray-500 dark:text-gray-400 mb-3 font-semibold">
-              Account Level
-            </Text>
-            <Text className="text-base font-semibold dark:text-white">
-              Platinum Pro
-            </Text>
-          </View>
-          <View className="flex-1 items-center justify-center">
-            <Text className="text-gray-500 dark:text-gray-400 mb-3 font-semibold">
-              Safety Score
-            </Text>
-            <Text className="text-base font-semibold dark:text-white">
-              98/100
-            </Text>
-          </View>
+        <View className="flex-row justify-between gap-2 items-center">
+          {userStats.map((stat, i) => (
+            <View key={i} className="flex flex-col items-center gap-1 w-[33%]">
+              <Text className="text-[10px] uppercase font-bold text-gray-400 tracking-widest mb-1">
+                {stat.label}
+              </Text>
+              <Text className="text-sm font-bold text-gray-900 dark:text-white">
+                {stat.value}
+              </Text>
+            </View>
+          ))}
         </View>
       </View>
       {/* Personal Information */}
@@ -74,7 +81,7 @@ const Profile = () => {
         </Text>
         <View className=" flex-1 flex-row items-center justify-between pl-8  p-3 hover:focus:to-blue-400 rounded-full bg-gray-100 dark:bg-white/5 w-full">
           <Text className="text-gray-900 dark:text-gray-300 font-semibold">
-            test@test.com
+            {user?.user?.email}
           </Text>
           <ChevronRight className="w-4 h-4 text-gray-400" />
         </View>

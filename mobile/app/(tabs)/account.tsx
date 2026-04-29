@@ -1,344 +1,369 @@
+import React from "react";
+import { View, Text, ScrollView, Pressable } from "react-native";
+import { router } from "expo-router";
+import { useColorScheme } from "nativewind";
 import {
-  View,
-  Text,
-  Pressable,
-  ScrollView,
-  useColorScheme,
-} from "react-native";
-import {
-  Sparkles,
   ShieldCheck,
-  Loader2,
-  ArrowRight,
   Zap,
-  TrendingUp,
-  Globe,
+  Loader2,
+  Sparkles,
+  ArrowRight,
   Wallet,
+  Globe,
+  TrendingUp,
   Fingerprint,
   Lock,
 } from "lucide-react-native";
 import { useProfileQuery } from "../../services/auth.api.js";
-import { router } from "expo-router";
 import {
   useGetAccountQuery,
   useCreateAccountMutation,
 } from "../../services/account.api.js";
 
-const Account = () => {
+const account = () => {
+  const { colorScheme } = useColorScheme();
   const { data: profile } = useProfileQuery({});
-  const { data, error } = useGetAccountQuery({});
+  const { data, isLoading, error } = useGetAccountQuery({});
   const [createAccount, { isLoading: isCreating }] = useCreateAccountMutation();
-  const colorScheme = useColorScheme();
 
   const handleCreateAccount = async () => {
     try {
       await createAccount({}).unwrap();
-    } catch (error) {
-      console.log(error);
+    } catch (err) {
+      console.error("Failed to create account:", err);
     }
   };
-  // Step-1
-  if ((error && "status" in error && error.status === 404) || !data?.account) {
+
+  if (isLoading) {
     return (
-      <View className="flex flex-col justify-center mt-20 gap-5 items-center">
-        <View className="bg-blue-600 p-4 rounded-3xl shadow-lg shadow-blue-500/30">
-          <Sparkles color="white" size={40} />
-        </View>
-        <View className="flex items-center gap-4 p-4 justify-center">
-          <Text className="font-bold text-3xl text-gray-900 dark:text-white">
-            Elevate Your <Text className="text-blue-600">Finance</Text>
+      <View className="flex-1 items-center justify-center bg-gray-50 dark:bg-[#0c0f1a]">
+        <Loader2 size={40} color="#3b82f6" />
+      </View>
+    );
+  }
+
+  // State 1: No Account Found (404)
+  if ((error as any)?.status === 404 || !data?.account) {
+    return (
+      <ScrollView
+        className="flex-1 bg-gray-50 dark:bg-[#0c0f1a]"
+        contentContainerStyle={{
+          flexGrow: 1,
+          justifyContent: "center",
+          padding: 20,
+        }}
+      >
+        <View className="items-center text-center">
+          <View className="mb-8">
+            <View className="w-24 h-24 bg-blue-600 rounded-[2rem] items-center justify-center shadow-lg shadow-blue-500/40">
+              <Sparkles size={40} color="#ffffff" />
+            </View>
+          </View>
+
+          <Text className="text-4xl font-black text-gray-900 dark:text-white mb-4 text-center tracking-tight">
+            Elevate Your{" "}
+            <Text className="text-blue-600 dark:text-blue-500">Finance</Text>
           </Text>
-          <Text className="text-center font-medium text-xl text-gray-600 dark:text-gray-300">
+
+          <Text className="text-gray-500 dark:text-gray-400 text-center mb-10 leading-relaxed font-medium">
             Join the elite circle of NeuroBank users and unlock a new dimension
             of digital banking.
           </Text>
-        </View>
-        <View className="flex gap-4">
-          <View className="p-6 justify-center rounded-[2.5rem] bg-white dark:bg-[#0f1221] border border-gray-100 dark:border-white/5 flex flex-col items-center gap-4 hover:border-blue-500/30 transition-all shadow-sm">
-            <View className="w-12 h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 flex items-center justify-center">
-              <ShieldCheck color="#059669" size={20} />
+
+          <View className="w-full gap-4 mb-12">
+            <View className="p-6 rounded-[2.5rem] bg-white dark:bg-[#0f1221] border border-gray-100 dark:border-white/5 items-center gap-4 shadow-sm">
+              <View className="w-12 h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-500/10 items-center justify-center">
+                <ShieldCheck size={24} color="#10b981" />
+              </View>
+              <View className="items-center">
+                <Text className="font-bold text-sm text-gray-900 dark:text-white mb-1">
+                  Elite Security
+                </Text>
+                <Text className="text-xs text-gray-500 dark:text-gray-400 text-center">
+                  Military-grade protection for your wealth.
+                </Text>
+              </View>
             </View>
-            <View className="text-center">
-              <Text className="text-center font-semibold text-xl text-gray-900 dark:text-white mb-1">
-                Elite Security
-              </Text>
-              <Text className="text-lg text-gray-500 dark:text-gray-400">
-                Military-grade protection for your wealth.
-              </Text>
+
+            <View className="p-6 rounded-[2.5rem] bg-white dark:bg-[#0f1221] border border-gray-100 dark:border-white/5 items-center gap-4 shadow-sm">
+              <View className="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-500/10 items-center justify-center">
+                <Zap size={24} color="#3b82f6" />
+              </View>
+              <View className="items-center">
+                <Text className="font-bold text-sm text-gray-900 dark:text-white mb-1">
+                  Instant Scale
+                </Text>
+                <Text className="text-xs text-gray-500 dark:text-gray-400 text-center">
+                  Deploy capital globally in milliseconds.
+                </Text>
+              </View>
             </View>
           </View>
-          <View className="p-6 justify-center rounded-[2.5rem] bg-white dark:bg-[#0f1221] border border-gray-100 dark:border-white/5 flex flex-col items-center gap-4 hover:border-blue-500/30 transition-all shadow-sm">
-            <View className="w-12 h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 flex items-center justify-center">
-              <Zap color="#3b82f6" size={20} />
-            </View>
-            <View className="text-center">
-              <Text className="font-semibold text-center text-xl text-gray-900 dark:text-white mb-1">
-                Instant Scale
-              </Text>
-              <Text className="text-lg text-gray-500 dark:text-gray-400">
-                Deploy capital globally in milliseconds.
-              </Text>
-            </View>
-          </View>
-        </View>
-        <View className="flex items-center justify-center mt-5">
+
           <Pressable
             onPress={handleCreateAccount}
             disabled={isCreating}
-            className="flex-row items-center justify-center gap-3 px-14 py-5 rounded-[2rem] bg-gray-900 dark:bg-white overflow-hidden transition-all transform hover:scale-[1.03] active:scale-95 disabled:opacity-50"
+            className={`flex-row items-center justify-center gap-3 w-full py-5 rounded-[2rem] shadow-md ${
+              isCreating ? "bg-gray-400" : "bg-gray-900 dark:bg-white"
+            }`}
           >
-            <View className="absolute inset-0 bg-gradient-to-r from-blue-600 to-indigo-600 opacity-0 hover:opacity-100 transition-opacity duration-500" />
             {isCreating ? (
               <Loader2
-                className="w-6 h-6 animate-spin z-10"
-                color={colorScheme === "dark" ? "#000" : "#fff"}
+                size={24}
+                color={colorScheme === "dark" ? "#000000" : "#ffffff"}
               />
             ) : (
               <>
-                <Text className="z-10 text-center font-bold text-white dark:text-black text-xl transition-colors">
+                <Text className="text-white dark:text-black font-black text-base">
                   Generate Portfolio
                 </Text>
                 <ArrowRight
-                  color={colorScheme === "dark" ? "#000" : "#fff"}
                   size={20}
+                  color={colorScheme === "dark" ? "#000000" : "#ffffff"}
                 />
               </>
             )}
           </Pressable>
         </View>
-      </View>
+      </ScrollView>
     );
   }
 
-  // /Step-2
+  // State 2: Account Exists
   const account = data.account;
+
   return (
-    <ScrollView className="py-10 px-5">
-      <View className="px-10 py-5">
-        <Text className="text-4xl text-center font-bold text-gray-900 dark:text-white tracking-tight">
-          Main Vault
-        </Text>
-        <Text className=" text-gray-400 text-center dark:text-gray-200">
-          Manage your primary assets and liquidity
-        </Text>
-      </View>
-
-      {/* Account Overview Card */}
-      <View className="bg-[#0f1221] dark:bg-[#0a0c16] rounded-[2.5rem] p-6 w-full mb-6 shadow-xl border border-gray-800 dark:border-white/5">
-        {/* Header */}
-        <View className="flex-row justify-between items-start mb-8">
-          <View className="flex-row items-center gap-4">
-            <View className="w-14 h-14 rounded-2xl border border-blue-500/30 flex items-center justify-center bg-blue-500/10">
-              <Sparkles color="#3b82f6" size={24} />
-            </View>
-            <View>
-              <Text className="text-gray-500 font-black text-[10px] tracking-widest uppercase mb-1">
-                Neurobank
-              </Text>
-              <Text className="text-white font-black text-xl tracking-tight">
-                Onyx Reserve
-              </Text>
-            </View>
+    <ScrollView
+      className="flex-1 bg-gray-50 dark:bg-[#0c0f1a]"
+      contentContainerStyle={{ paddingBottom: 40 }}
+    >
+      <View className="p-5 md:p-8 lg:p-12 mt-5">
+        {/* Header Section */}
+        <View className="flex-row items-center justify-between mb-8">
+          <View>
+            <Text className="text-3xl font-black text-gray-900 dark:text-white tracking-tight">
+              Main Vault
+            </Text>
+            <Text className="text-sm text-gray-500 font-medium mt-1">
+              Manage your primary assets and liquidity
+            </Text>
           </View>
-          <View className="border border-blue-500/30 px-3 py-1.5 rounded-full bg-blue-500/10">
-            <Text className="text-blue-500 font-black text-[10px] tracking-widest uppercase">
-              Priority Elite
+          <View className="flex-row items-center gap-2 px-3 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
+            <View className="w-1.5 h-1.5 rounded-full bg-emerald-500"></View>
+            <Text className="text-emerald-500 text-[9px] font-black uppercase tracking-[0.2em]">
+              {account.status}
             </Text>
           </View>
         </View>
 
-        {/* Cardholder */}
-        <View className="mb-6">
-          <Text className="text-gray-500 font-black text-xs tracking-[0.15em] uppercase mb-1">
-            Cardholder
-          </Text>
-          <Text className="text-white font-black text-lg uppercase tracking-wider">
-            {profile?.name || profile?.email?.split("@")[0] || "TEST TEST"}
-          </Text>
-        </View>
-
-        {/* Liquidity */}
-        <View className="mb-8">
-          <Text className="text-gray-500 font-black text-xs tracking-[0.15em] uppercase mb-1">
-            Available Liquidity
-          </Text>
-          <View className="flex-row items-baseline">
-            <Text className="text-gray-600 font-black text-xl mr-2">INR</Text>
-            <Text className="text-white font-black text-4xl tracking-tight">
-              {account?.balance ? Number(account.balance).toFixed(2) : "0.00"}
-            </Text>
-          </View>
-        </View>
-
-        {/* Vault Identifier */}
-        <View className="bg-[#1a1d2e] dark:bg-white/5 rounded-[1.5rem] p-5 border border-gray-800 dark:border-white/5">
-          <Text className="text-gray-500 font-black text-[10px] tracking-widest uppercase mb-2">
-            Vault Identifier
-          </Text>
-          <Text className="text-white font-black text-xl tracking-[0.2em]">
-            {data?.accountNumber
-              ? data.accountNumber
-                  .toString()
-                  .replace(/(.{4})/g, "$1 ")
-                  .trim()
-              : "9876 6548 8712"}
-          </Text>
-        </View>
-      </View>
-      {/* Available Balance Card */}
-      <View className="bg-gray-900 dark:bg-[#0a0c16] rounded-[2.5rem] p-8 w-full mb-6 shadow-xl">
-        <Text className="text-gray-400 font-bold text-xs uppercase tracking-[0.15em] mb-3">
-          Available Balance
-        </Text>
-
-        <View className="flex-row items-baseline mb-8">
-          <Text className="text-gray-500 font-black text-lg mr-3">INR</Text>
-          <Text className="text-white font-black text-[3.5rem] leading-tight tracking-tight">
-            {account?.balance ? Number(account.balance).toFixed(2) : "0.00"}
-          </Text>
-        </View>
-
-        <Pressable
-          onPress={() => router.push("/transfer")}
-          className="bg-gray-800 dark:bg-[#1e2238] active:bg-gray-700 dark:active:bg-[#2a2f4c] py-4 rounded-2xl w-full border border-gray-700 dark:border-white/5 transition-colors"
-        >
-          <Text className="text-white text-center font-bold text-lg">
-            Send Money
-          </Text>
-        </Pressable>
-      </View>
-
-      {/* Three rate */}
-      <View className="flex-row items-center flex-wrap justify-center gap-4 w-full">
-        {[
-          {
-            label: "Nominal Rate",
-            value: "4.25%",
-            icon: TrendingUp,
-            iconColor: "#10b981", // emerald-500
-            bg: "bg-emerald-500/10",
-          },
-          {
-            label: "Reserve Limit",
-            value: "∞",
-            icon: Wallet,
-            iconColor: "#f59e0b", // amber-500
-            bg: "bg-amber-500/10",
-          },
-          {
-            label: "Global Liquidity",
-            value: "Liquid",
-            icon: Globe,
-            iconColor: "#3b82f6", // blue-500
-            bg: "bg-blue-500/10",
-          },
-        ].map((stat, i) => (
-          <View
-            key={i}
-            className="bg-white flex items-center justify-center dark:bg-[#0f1221] p-6 rounded-[2.5rem] border border-gray-100 dark:border-white/5 shadow-sm transition-all w-[46%] min-w-[150px]"
-          >
-            <View
-              className={`w-10 h-10 rounded-xl ${stat.bg} flex items-center justify-center mb-6`}
-            >
-              <stat.icon size={20} color={stat.iconColor} />
-            </View>
-            <Text className="text-base text-center text-gray-400 uppercase font-black tracking-widest mb-1">
-              {stat.label}
-            </Text>
-            <Text className="text-xl text-center font-black text-gray-900 dark:text-white uppercase">
-              {stat.value}
-            </Text>
-          </View>
-        ))}
-      </View>
-      {/* three security options */}
-      <View className="bg-white flex items-center justify-center dark:bg-[#0f1221] p-6 rounded-[2.5rem] border border-gray-100 dark:border-white/5 shadow-sm transition-all w-full mt-6 mb-10">
-        <Text className="text-2xl text-center text-gray-900 dark:text-white uppercase font-black tracking-widest mb-6 mt-2">
-          Security Matrix
-        </Text>
-
-        <View className="w-full flex-col gap-4">
-          {[
-            {
-              label: "Biometric Key",
-              icon: Fingerprint,
-              iconColor: "#3b82f6", // blue-500
-              bg: "bg-blue-500/10",
-              active: true,
-            },
-            {
-              label: "Geo-Lock",
-              icon: Globe,
-              iconColor: "#10b981", // emerald-500
-              bg: "bg-emerald-500/10",
-              active: true,
-            },
-            {
-              label: "Freeze Assets",
-              icon: Lock,
-              iconColor: "#ef4444", // red-500
-              bg: "bg-red-500/10",
-              active: false,
-            },
-          ].map((setting, i) => (
-            <View
-              key={i}
-              className="flex-row items-center justify-between p-3 pl-4 rounded-[2rem] bg-gray-50 dark:bg-white/5 w-full border border-gray-100 dark:border-white/5 shadow-sm"
-            >
-              <View className="flex-row gap-4 items-center">
-                <View
-                  className={`w-12 h-12 flex items-center justify-center rounded-full ${setting.bg}`}
-                >
-                  <setting.icon color={setting.iconColor} size={24} />
-                </View>
-                <Text className="text-gray-900 dark:text-gray-100 font-bold text-lg tracking-tight">
-                  {setting.label}
+        {/* Onyx Reserve Account Card */}
+        <View className="bg-[#05070a] rounded-[2.5rem] p-6 shadow-2xl mb-8 overflow-hidden">
+          <View className="flex-row justify-between items-start mb-10">
+            <View className="flex-row items-center gap-4">
+              <View className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 items-center justify-center">
+                <Sparkles size={24} color="#60a5fa" />
+              </View>
+              <View>
+                <Text className="text-[9px] text-white/50 font-black uppercase tracking-[0.4em] mb-1">
+                  NeuroBank
+                </Text>
+                <Text className="text-xl font-black text-white tracking-tight">
+                  Onyx Reserve
                 </Text>
               </View>
-              <Pressable
-                className={`w-[3.25rem] h-8 rounded-full relative p-1 transition-colors mr-1 flex-row items-center ${
-                  setting.active
-                    ? "bg-emerald-500"
-                    : "bg-gray-300 dark:bg-gray-700"
-                }`}
-              >
-                <View
-                  className={`w-6 h-6 bg-white rounded-full shadow-sm transition-all ${
-                    setting.active ? "ml-auto" : "mr-auto"
-                  }`}
-                />
-              </Pressable>
             </View>
-          ))}
+            <View className="px-2 py-1 rounded-lg bg-blue-500/20 border border-blue-500/30">
+              <Text className="text-[8px] font-black text-blue-400 uppercase tracking-widest">
+                Elite
+              </Text>
+            </View>
+          </View>
+
+          <View className="space-y-6 mb-8">
+            <View>
+              <Text className="text-[9px] text-white/40 font-black uppercase tracking-[0.3em] mb-1.5">
+                Cardholder
+              </Text>
+              <Text className="text-base font-bold text-white tracking-wide uppercase">
+                {profile?.user?.fullName?.firstName}{" "}
+                {profile?.user?.fullName?.lastName}
+              </Text>
+            </View>
+
+            <View>
+              <Text className="text-[9px] text-white/40 font-black uppercase tracking-[0.3em] mb-2">
+                Available Liquidity
+              </Text>
+              <View className="flex-row items-baseline gap-2">
+                <Text className="text-xl text-white/30 font-black tracking-tighter">
+                  {account.currency === "INR" ? "₹" : "$"}
+                </Text>
+                <Text className="text-4xl font-black tracking-tighter text-white">
+                  {account.balance.toLocaleString("en-IN")}
+                  <Text className="text-xl text-white/50">.00</Text>
+                </Text>
+              </View>
+            </View>
+          </View>
+
+          <View className="bg-white/5 border border-white/10 rounded-2xl p-4 self-start">
+            <Text className="text-[8px] text-white/40 uppercase font-black tracking-widest mb-1.5">
+              Vault Identifier
+            </Text>
+            <Text className="text-sm font-mono font-black text-white tracking-[0.2em]">
+              {account.accountNumber.match(/.{1,4}/g)?.join(" ") ||
+                account.accountNumber}
+            </Text>
+          </View>
         </View>
-      </View>
 
-      {/* Alpha Prime Upgrade Card */}
-      <View className="bg-blue-600 rounded-[2.5rem] p-8 w-full mb-10 shadow-lg shadow-blue-600/30">
-        <Sparkles color="rgba(255, 255, 255, 0.6)" size={32} />
-
-        <View className="mt-6 mb-4">
-          <Text className="text-white text-3xl font-black tracking-tight">
-            Upgrade to
-          </Text>
-          <Text className="text-white text-3xl font-black tracking-tight">
-            Alpha Prime
-          </Text>
+        {/* Balance & Stats Overview */}
+        <View className="bg-[#0a0c14] rounded-[2rem] border border-gray-800 p-6 shadow-md mb-8">
+          <View className="flex-row items-center justify-between gap-4">
+            <View>
+              <Text className="text-[10px] text-gray-500 font-black uppercase tracking-[0.2em] mb-2">
+                Available Balance
+              </Text>
+              <View className="flex-row items-baseline gap-2">
+                <Text className="text-xs text-gray-500 font-bold uppercase tracking-widest">
+                  {account.currency}
+                </Text>
+                <Text className="text-3xl font-black text-white tracking-tighter">
+                  {account.balance.toLocaleString("en-IN", {
+                    minimumFractionDigits: 2,
+                  })}
+                </Text>
+              </View>
+            </View>
+            <Pressable
+              onPress={() => router.push("/(tabs)/transfer")}
+              className="bg-[#1a1d2d] px-5 py-3 rounded-xl border border-white/10"
+            >
+              <Text className="text-white font-bold text-xs">Send Money</Text>
+            </Pressable>
+          </View>
         </View>
 
-        <Text className="text-blue-100 text-base font-medium mb-8 leading-6 pr-4">
-          Join our exclusive tier for institutional-grade features and zero
-          fees.
-        </Text>
+        {/* Account Details / Stats Grid */}
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          className="mb-8 overflow-visible"
+        >
+          <View className="flex-row gap-4">
+            <View className="bg-white dark:bg-[#0f1221] p-6 rounded-[2rem] border border-gray-100 dark:border-white/5 shadow-sm w-36">
+              <View className="w-10 h-10 rounded-xl bg-emerald-500/10 items-center justify-center mb-4">
+                <TrendingUp size={20} color="#10b981" />
+              </View>
+              <Text className="text-[9px] text-gray-400 uppercase font-black tracking-widest mb-1">
+                Nominal Rate
+              </Text>
+              <Text className="text-lg font-black text-gray-900 dark:text-white uppercase">
+                4.25%
+              </Text>
+            </View>
 
-        <Pressable className="bg-white rounded-2xl py-4 w-full flex-row items-center justify-center active:scale-95 transition-transform shadow-sm">
-          <Text className="text-blue-600 font-black text-sm tracking-widest uppercase">
-            Claim Invitation
+            <View className="bg-white dark:bg-[#0f1221] p-6 rounded-[2rem] border border-gray-100 dark:border-white/5 shadow-sm w-36">
+              <View className="w-10 h-10 rounded-xl bg-blue-500/10 items-center justify-center mb-4">
+                <Globe size={20} color="#3b82f6" />
+              </View>
+              <Text className="text-[9px] text-gray-400 uppercase font-black tracking-widest mb-1">
+                Liquidity
+              </Text>
+              <Text className="text-lg font-black text-gray-900 dark:text-white uppercase">
+                Liquid
+              </Text>
+            </View>
+
+            <View className="bg-white dark:bg-[#0f1221] p-6 rounded-[2rem] border border-gray-100 dark:border-white/5 shadow-sm w-36 mr-4">
+              <View className="w-10 h-10 rounded-xl bg-amber-500/10 items-center justify-center mb-4">
+                <Wallet size={20} color="#f59e0b" />
+              </View>
+              <Text className="text-[9px] text-gray-400 uppercase font-black tracking-widest mb-1">
+                Reserve Limit
+              </Text>
+              <Text className="text-lg font-black text-gray-900 dark:text-white uppercase">
+                ∞
+              </Text>
+            </View>
+          </View>
+        </ScrollView>
+
+        {/* Security Matrix */}
+        <View className="bg-white dark:bg-[#0f1221] rounded-[2.5rem] border border-gray-100 dark:border-white/5 p-6 shadow-sm mb-8">
+          <Text className="text-xs font-black text-gray-900 dark:text-white mb-6 uppercase tracking-[0.3em]">
+            Security Matrix
           </Text>
-        </Pressable>
+          <View className="gap-3">
+            {[
+              {
+                label: "Biometric Key",
+                icon: Fingerprint,
+                colorClass: "bg-blue-500/10",
+                colorCode: "#3b82f6",
+                active: true,
+              },
+              {
+                label: "Geo-Lock",
+                icon: Globe,
+                colorClass: "bg-emerald-500/10",
+                colorCode: "#10b981",
+                active: true,
+              },
+              {
+                label: "Freeze Assets",
+                icon: Lock,
+                colorClass: "bg-red-500/10",
+                colorCode: "#ef4444",
+                active: false,
+              },
+            ].map((tool, i) => (
+              <View
+                key={i}
+                className="flex-row items-center justify-between p-4 rounded-2xl bg-gray-50 dark:bg-white/[0.03]"
+              >
+                <View className="flex-row items-center gap-3">
+                  <View
+                    className={`w-10 h-10 rounded-xl ${tool.colorClass} items-center justify-center`}
+                  >
+                    <tool.icon size={20} color={tool.colorCode} />
+                  </View>
+                  <Text className="text-sm font-black tracking-tight text-gray-700 dark:text-gray-300">
+                    {tool.label}
+                  </Text>
+                </View>
+                <View
+                  className={`w-10 h-5 rounded-full p-1 justify-center ${tool.active ? "bg-emerald-500" : "bg-gray-300 dark:bg-white/10"}`}
+                >
+                  <View
+                    className={`w-3 h-3 bg-white rounded-full ${tool.active ? "self-end" : "self-start"}`}
+                  ></View>
+                </View>
+              </View>
+            ))}
+          </View>
+        </View>
+
+        {/* Alpha Prime Upgrade */}
+        <View className="bg-blue-700 rounded-[2.5rem] p-6 shadow-md overflow-hidden relative">
+          <View className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-10 -mt-10"></View>
+          <Sparkles size={24} color="#ffffff" className="mb-4 opacity-40" />
+          <Text className="text-xl font-black mb-2 text-white">
+            Upgrade to{"\n"}Alpha Prime
+          </Text>
+          <Text className="text-white/70 text-xs mb-6 font-medium">
+            Join our exclusive tier for institutional-grade features and zero
+            fees.
+          </Text>
+          <Pressable className="w-full py-4 rounded-xl bg-white items-center justify-center">
+            <Text className="text-blue-700 font-black text-[10px] uppercase tracking-widest">
+              Claim Invitation
+            </Text>
+          </Pressable>
+        </View>
       </View>
     </ScrollView>
   );
 };
 
-export default Account;
+export default account;

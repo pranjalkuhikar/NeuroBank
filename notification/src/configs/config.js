@@ -14,6 +14,7 @@ const _config = {
   CLIENT_SECRET: process.env.CLIENT_SECRET,
   REFRESH_TOKEN: process.env.REFRESH_TOKEN,
   EMAIL_USER: process.env.EMAIL_USER,
+  EMAIL_PASSWORD: process.env.EMAIL_PASSWORD,
 };
 
 const config = Object.freeze(_config);
